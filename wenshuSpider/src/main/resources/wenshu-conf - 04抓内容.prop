@@ -1,0 +1,12 @@
+driverPath=C:/wenshu/geckodriver.exe
+step4GetArticleDetail=true
+step4GetArticleDetail_thread=2
+step4GetArticleDetail_interval=300
+#一次获取n条文章
+step45_startPos=0
+step45_endPos=100
+
+#因为分表，请勿跨年
+step45_startDate=2017-03-01
+step45_endDate=2017-12-31
+step45_stepDate=15
