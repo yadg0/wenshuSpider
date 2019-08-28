@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.jd.spider.wenshu.dao.ICourtDao">
+
+	<sql id="COMMON-SQL">
+		<where>
+				<if test="id !=null and id !=''"> AND id = #{id}</if>
+				<if test="name !=null and name !=''"> AND name = #{name}</if>
+				<if test="param !=null and param !=''"> AND param = #{param}</if>
+				<if test="parval !=null and parval !=''"> AND parval = #{parval}</if>
+				<if test="level !=null and level !=''"> AND level = #{level}</if>
+				<if test="key !=null and key !=''"> AND `key` = #{key}</if>
+				<if test="createdUser !=null and createdUser !=''"> AND created_user = #{createdUser}</if>
+				<if test="createdTime !=null and createdTime !=''"> AND created_time = #{createdTime}</if>
+				<if test="updatedUser !=null and updatedUser !=''"> AND updated_user = #{updatedUser}</if>
+				<if test="updatedTime !=null and updatedTime !=''"> AND updated_time = #{updatedTime}</if>
+				<if test="yn !=null and yn !=''"> AND yn = #{yn}</if>
+		</where>
+	</sql>
+	<sql id="COMMON-SQL-ALIAS">
+		<where>
+				<if test="id !=null and id !=''"> AND a.id = #{id}</if>
+				<if test="name !=null and name !=''"> AND a.name = #{name}</if>
+				<if test="param !=null and param !=''"> AND a.param = #{param}</if>
+				<if test="parval !=null and parval !=''"> AND a.parval = #{parval}</if>
+				<if test="level !=null and level !=''"> AND a.level = #{level}</if>
+				<if test="key !=null and key !=''"> AND a.`key` = #{key}</if>
+				<if test="createdUser !=null and createdUser !=''"> AND a.created_user = #{createdUser}</if>
+				<if test="createdTime !=null and createdTime !=''"> AND a.created_time = #{createdTime}</if>
+				<if test="updatedUser !=null and updatedUser !=''"> AND a.updated_user = #{updatedUser}</if>
+				<if test="updatedTime !=null and updatedTime !=''"> AND a.updated_time = #{updatedTime}</if>
+				<if test="yn !=null and yn !=''"> AND a.yn = #{yn}</if>
+		</where>
+	</sql>
+	<sql id="ORDER-SQL">
+		<if test="orderBy != null and orderBy != ''"><![CDATA[ORDER BY ${orderBy}]]></if>
+	</sql>
+	<sql id="All-FIELDS">
+		id AS id,name AS name,param AS param,parval AS parval,level AS level,`key` AS `key`,created_user AS createdUser,created_time AS createdTime,updated_user AS updatedUser,updated_time AS updatedTime,yn AS yn
+	</sql>
+	<sql id="All-FIELDS-ALIAS">
+		a.id AS id,a.name AS name,a.param AS param,a.parval AS parval,a.level AS level,a.`key` AS `key`,a.created_user AS createdUser,a.created_time AS createdTime,a.updated_user AS updatedUser,a.updated_time AS updatedTime,a.yn AS yn
+	</sql>
+	<!--获取数据 -->
+	<select id="getCourtById" resultType="court" parameterType="java.lang.Long">
+		select
+		<include refid="All-FIELDS" />
+		FROM court WHERE ID = #{id}
+	</select>
+
+	<!--插入数据 -->
+	<insert id="addCourt" parameterType="court">
+		insert into court
+		(
+		id,name,param,parval,level,`key`,created_user,created_time,updated_user,updated_time,yn
+		)values(
+		#{id},#{name},#{param},#{parval},#{level},#{key},#{createdUser},#{createdTime},#{updatedUser},#{updatedTime},#{yn}
+		)
+		<selectKey resultType="java.lang.Long" keyProperty="id"
+			order="AFTER">
+			select last_insert_id() as ID from dual
+		</selectKey>
+	</insert>
+
+	<!--更新数据 -->
+	<update id="updateCourt" parameterType="court">
+		update court
+		<set>
+				<if test="name !=null"> name = #{name},</if>
+				<if test="param !=null"> param = #{param},</if>
+				<if test="parval !=null"> parval = #{parval},</if>
+				<if test="level !=null"> level = #{level},</if>
+				<if test="key !=null"> `key` = #{key},</if>
+				<if test="createdUser !=null"> created_user = #{createdUser},</if>
+				<if test="createdTime !=null"> created_time = #{createdTime},</if>
+				<if test="updatedUser !=null"> updated_user = #{updatedUser},</if>
+				<if test="updatedTime !=null"> updated_time = #{updatedTime},</if>
+				<if test="yn !=null"> yn = #{yn},</if>
+		</set>
+		where ID = #{id}
+	</update>
+
+	<!--删除数据 -->
+	<update id="deleteCourtById" parameterType="court">
+		update court set yn=0 ,
+		 updated_time=#{updatedTime} ,
+		 updated_user=#{updatedUser}
+		where id = #{id} 
+	</update>
+
+	<!--分页查询 -->
+	<select id="getCourtByPage" resultType="court"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="All-FIELDS" />
+		from court
+		<include refid="COMMON-SQL" />
+		<include refid="ORDER-SQL" />
+		limit #{startIndex},#{pageSize}
+	</select>
+	
+	<select id="count" resultType="java.lang.Integer" parameterType="java.util.HashMap">
+		<![CDATA[
+			SELECT COUNT(1) FROM court
+		]]>
+		<include refid="COMMON-SQL" />
+	</select>
+	<!--通用查询 -->
+	<select id="getCourt" resultType="court"
+		parameterType="court">
+		select
+		<include refid="All-FIELDS-ALIAS" />
+		from court a
+		<include refid="COMMON-SQL" />
+		<if test="taskState!=null">
+			and exists (select * from article_page_task b where a.id=b.court_id and b.state=0)
+		</if>
+		<include refid="ORDER-SQL" />
+	</select>
+	<!--通用查询 -->
+	<select id="getAllCourt" resultType="court"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="All-FIELDS" />
+		from court
+		<include refid="ORDER-SQL" />
+	</select>
+</mapper>
